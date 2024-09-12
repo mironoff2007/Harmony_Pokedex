@@ -1,10 +1,9 @@
 import { router } from '@kit.ArkUI';
 import { RouteConstants } from './RouteConstants';
-import SplashViewModel from '../viewmodel/SplashViewModel';
 
 @Entry
 @Component
-struct SplashIndex {
+struct SplashAnimation {
   build() {
     RelativeContainer() {
       Text("Pokedex")
