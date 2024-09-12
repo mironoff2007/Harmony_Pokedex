@@ -1,6 +1,7 @@
 import { router } from '@kit.ArkUI';
 import { RouteConstants } from './RouteConstants';
 import { SplashViewModel } from '../viewmodel/SplashViewModel';
+import { SplashConstants } from '../viewmodel/SplashConstants';
 
 let storage: LocalStorage = new LocalStorage();
 let splashViewModel: SplashViewModel = new SplashViewModel(storage)
@@ -9,7 +10,9 @@ let splashViewModel: SplashViewModel = new SplashViewModel(storage)
 @Component
 struct SplashAsync {
 
-  @LocalStorageProp('splashEnd') @Watch('onSplashEnd') splashEnd: boolean = false;
+  @LocalStorageProp(SplashConstants.SPLASH_END)
+  @Watch('onSplashEnd')
+  splashEnd: boolean = false;
 
   // @Watch callback
   onSplashEnd(splashEnd: boolean): void {
@@ -44,7 +47,7 @@ struct SplashAsync {
     .width('100%')
     .onAppear(() => {
       console.log('on appear')
-      splashViewModel.performingLongRunningTask()
+      splashViewModel.performLongRunningTask()
     })
   }
 }

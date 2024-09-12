@@ -1,6 +1,7 @@
 import backgroundTaskManager from '@ohos.resourceschedule.backgroundTaskManager';
 import { router } from '@kit.ArkUI';
 import { RouteConstants } from '../pages/RouteConstants';
+import { SplashConstants } from '../viewmodel/SplashConstants';
 
 export class SplashViewModel {
   constructor(storage: LocalStorage) {
@@ -49,7 +50,7 @@ export class SplashViewModel {
     backgroundTaskManager.cancelSuspendDelay(this.id);
   }
 
-  async performingLongRunningTask() {
+  async performLongRunningTask() {
     // Before executing a time-consuming task, call the API to request a transient task to delay the suspension.
     this.requestSuspendDelay();
 
@@ -65,7 +66,7 @@ export class SplashViewModel {
     // Execute the time-consuming task.
     await this.sleep(3000)
     try {
-      let setResult = this.storage.set<boolean>('splashEnd', true);
+      let setResult = this.storage.set<boolean>(SplashConstants.SPLASH_END, true);
       console.log("setResult-" + setResult);
     } catch (e) {
       console.error(e)
