@@ -1,22 +1,24 @@
-import { router } from '@kit.ArkUI';
+import router from '@ohos.router';
 import { RouteConstants } from './RouteConstants';
 import { SplashViewModel } from '../viewmodel/SplashViewModel';
 import { SplashConstants } from '../viewmodel/SplashConstants';
 
-let storage: LocalStorage = new LocalStorage();
-let splashViewModel: SplashViewModel = new SplashViewModel(storage)
+//let para: Record<string,boolean> = { 'splashEnd' : false };
+const storage: LocalStorage = new LocalStorage();
+const splashViewModel: SplashViewModel = new SplashViewModel(storage)
 
 @Entry(storage)
 @Component
 struct SplashAsync {
+  @State message: string = 'Pokedex';
 
-  @LocalStorageProp(SplashConstants.SPLASH_END)
+  @LocalStorageProp('splashEnd')
   @Watch('onSplashEnd')
   splashEnd: boolean = false;
 
   // @Watch callback
-  onSplashEnd(splashEnd: boolean): void {
-    if (splashEnd) {
+  onSplashEnd(): void {
+    if (this.splashEnd) {
       console.info('splashEnd');
       router.replaceUrl({ url: RouteConstants.POKE_LIST })
     }
@@ -32,7 +34,8 @@ struct SplashAsync {
             middle: { anchor: '__container__', align: HorizontalAlign.Center }
           })
       }
-      Text('Pokedex')
+      Text(this.message)
+        .id(this.message)
         .fontSize(50)
         .fontWeight(FontWeight.Bold)
         .alignRules({
@@ -47,7 +50,7 @@ struct SplashAsync {
     .width('100%')
     .onAppear(() => {
       console.log('on appear')
-      splashViewModel.performLongRunningTask()
+      splashViewModel.prepareWhileSplashShown()
     })
   }
 }

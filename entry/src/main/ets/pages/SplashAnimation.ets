@@ -1,12 +1,15 @@
-import { router } from '@kit.ArkUI';
+import router from '@ohos.router';
 import { RouteConstants } from './RouteConstants';
 
 @Entry
 @Component
 struct SplashAnimation {
+  @State message: string = 'Pokedex';
+
   build() {
     RelativeContainer() {
-      Text("Pokedex")
+      Text(this.message)
+        .id(this.message)
         .fontSize(50)
         .fontWeight(FontWeight.Bold)
         .alignRules({
