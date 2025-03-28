@@ -1,5 +1,6 @@
 import router from '@ohos.router'
-import { ViewState } from '../common/State';
+import { ContentViewState, ViewState, ViewStateGeneric } from '../common/State';
+import { Pokemon } from '../model/Pokemon';
 import { PokeDetailParams } from '../viewmodel/pokedetail/PokeDetailParams'
 import { PokeDetailState } from '../viewmodel/pokedetail/PokeDetailState';
 import { PokeDetailViewModel } from '../viewmodel/pokedetail/PokeDetailViewModel';
@@ -10,12 +11,14 @@ const viewModel: PokeDetailViewModel = new PokeDetailViewModel(storage)
 @Entry(storage)
 @Component
 struct PokeDetail {
+  @State poke: Pokemon| null = null;
+  @State err: Error| null = null;
   @State progressVal: number = 0;
   @State intervalLoading: number = -1;
   @State name: string = ''
   @LocalStorageProp('pokeDetailState')
   @Watch('onStateChange')
-  state: ViewState<PokeDetailState> = ViewState.loading;
+  state: ViewStateGeneric<PokeDetailState> = ViewState.loading;
 
   // @Watch callback
   onStateChange(): void {
@@ -23,6 +26,8 @@ struct PokeDetail {
 
     } else if (ViewState.isContent(this.state)) {
       console.info("content")
+      const localState = this.state as ContentViewState<PokeDetailState>
+      this.poke = localState.value.pokemon
     }
   }
 
@@ -45,12 +50,14 @@ struct PokeDetail {
     } else if (ViewState.isContent(this.state)) {
       Stack() {
         Column() {
-          Image(this.state.value.pokemon.picUrl)
-            .height(150)
-            .objectFit(ImageFit.Fill)
-          Text(this.state.value.pokemon.name)
-            .fontSize(40)
-            .fontWeight(FontWeight.Bold)
+          if(this.poke != null) {
+            Image(this.poke.picUrl)
+              .height(150)
+              .objectFit(ImageFit.Fill)
+            Text(this.poke.name)
+              .fontSize(40)
+              .fontWeight(FontWeight.Bold)
+          }
         }
         .justifyContent(FlexAlign.Center)
         .height(120)
@@ -61,7 +68,9 @@ struct PokeDetail {
       .width('100%')
     } else if (ViewState.isFailure(this.state)) {
       Stack({ alignContent: Alignment.Center }) {
-        Text("Error-" + this.state.error)
+        if (this.err != null) {
+          Text("Error-" + this.err)
+        }
       }.width('100%').height('100%')
     } else {
 
