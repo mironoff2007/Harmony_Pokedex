@@ -50,7 +50,7 @@ struct SplashAsync {
     .width('100%')
     .onAppear(() => {
       console.log('on appear')
-      splashViewModel.prepareWhileSplashShown()
+      splashViewModel.prepareWhileSplashShown(this.getUIContext().getHostContext())
     })
   }
 }

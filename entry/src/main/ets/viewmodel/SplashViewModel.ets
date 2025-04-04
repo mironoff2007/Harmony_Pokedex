@@ -2,22 +2,32 @@ import { ViewModel } from '../common/ViewModel';
 import { POKE_TABLE } from '../db/PokeTable';
 import { store } from '../db/RDB';
 import { SplashConstants } from '../viewmodel/SplashConstants';
+import {loadRdbStore} from '../db/RDB'
 
 export class SplashViewModel extends ViewModel {
 
-  async prepareWhileSplashShown() {
-    this.backgroundTask(this.prepare())
+  async prepareWhileSplashShown(context: Context| undefined) {
+    if (context != null) {
+      this.backgroundTask(this.prepare(context))
+    } else {
+     console.error("context is null")
+    }
   }
 
-  private async prepare() {
-    await this.prepareTable()
+  private async prepare(context: Context) {
+    await this.prepareTable(context)
     await this.sleep(2000)
     this.endSplash()
   }
 
-  private async prepareTable(){
+  private async prepareTable(context: Context) {
     console.info('SplashVM-' + 'prepareTable');
-    await store.executeSql(POKE_TABLE.sqlCreate)
+    try {
+      await loadRdbStore(context)
+      await store.executeSql(POKE_TABLE.sqlCreate)
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   private endSplash() {

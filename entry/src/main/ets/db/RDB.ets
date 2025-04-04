@@ -8,15 +8,17 @@ const config: relationalStore.StoreConfig = {
   securityLevel: relationalStore.SecurityLevel.S1
 }
 
-export function loadRdbStore(ability: UIAbility): Promise<relationalStore.RdbStore> {
+export function loadRdbStore(context: Context): Promise<relationalStore.RdbStore> {
   return new Promise((resolve, reject) => {
-    relationalStore.getRdbStore(ability.context, config, async (err, rdbStore) => {
+    relationalStore.getRdbStore(context, config, async (err, rdbStore) => {
       store = rdbStore;
       if (err) {
         console.error(`Get RdbStore failed, err: ${err}`);
+        reject(err)
         return;
       }
       console.info(`Get RdbStore successfully.`);
+      resolve(store)
     })
   })
 }
