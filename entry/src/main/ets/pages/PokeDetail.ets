@@ -6,16 +6,19 @@ import { PokeDetailState } from '../viewmodel/pokedetail/PokeDetailState';
 import { PokeDetailViewModel } from '../viewmodel/pokedetail/PokeDetailViewModel';
 
 const storage: LocalStorage = new LocalStorage();
-const viewModel: PokeDetailViewModel = new PokeDetailViewModel(storage)
+
 
 @Entry(storage)
 @Component
 struct PokeDetail {
+  private  viewModel?: PokeDetailViewModel;
+
   @State poke: Pokemon| null = null;
   @State err: Error| null = null;
   @State progressVal: number = 0;
   @State intervalLoading: number = -1;
   @State name: string = ''
+
   @LocalStorageProp('pokeDetailState')
   @Watch('onStateChange')
   state: ViewStateGeneric<PokeDetailState> = ViewState.loading;
@@ -37,7 +40,8 @@ struct PokeDetail {
         0 : (this.progressVal + 5);
     }, 50);
     const pokeDetailParam = router.getParams() as PokeDetailParams
-    viewModel.getPokemon(pokeDetailParam.name)
+    this.viewModel = new PokeDetailViewModel(storage)
+    this.viewModel.getPokemon(pokeDetailParam.name)
   }
 
   build() {

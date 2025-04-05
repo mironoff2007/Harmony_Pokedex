@@ -6,13 +6,13 @@ import { RouteConstants } from './RouteConstants';
 import router from '@ohos.router';
 import { PokeDetailParams } from '../viewmodel/pokedetail/PokeDetailParams';
 import { PokeListAdapter } from '../viewmodel/pokelist/PokeListAdapter';
-
 let storage: LocalStorage = new LocalStorage();
-const pokeListViewModel: PokeListViewModel = new PokeListViewModel(storage)
 
 @Entry(storage)
 @Component
 struct PokeListPage {
+  private pokeListViewModel?: PokeListViewModel;
+
   @State message: string = 'PokeListPage';
   @State progressVal: number = 0;
   @State isLoading: boolean = true;
@@ -51,7 +51,8 @@ struct PokeListPage {
   }
 
   aboutToAppear() {
-    pokeListViewModel.getPokemons()
+    this.pokeListViewModel = new PokeListViewModel(storage)
+    this.pokeListViewModel.getPokemons()
     this.intervalLoading = setInterval(() => {
       this.progressVal = this.progressVal >= 100 ?
         0 : (this.progressVal + 5);
@@ -97,12 +98,6 @@ struct PokeListPage {
                 }
                 .alignItems(VerticalAlign.Center)
                 .justifyContent(FlexAlign.Center)
-                .onAppear(() => {
-                  console.info("draw-" + item.name)
-                  if (item.picUrl == "") {
-                    pokeListViewModel.getPokeInfo(item)
-                  }
-                })
               }
             }
             .height(120)

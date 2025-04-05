@@ -3,15 +3,14 @@ import { RouteConstants } from './RouteConstants';
 import { SplashViewModel } from '../viewmodel/SplashViewModel';
 import { SplashConstants } from '../viewmodel/SplashConstants';
 
-//let para: Record<string,boolean> = { 'splashEnd' : false };
 const storage: LocalStorage = new LocalStorage();
-const splashViewModel: SplashViewModel = new SplashViewModel(storage)
 
 @Entry(storage)
 @Component
 struct SplashAsync {
-  @State message: string = 'Pokedex';
+  private splashViewModel?: SplashViewModel
 
+  @State message: string = 'Pokedex';
   @LocalStorageProp('splashEnd')
   @Watch('onSplashEnd')
   splashEnd: boolean = false;
@@ -22,6 +21,10 @@ struct SplashAsync {
       console.info('splashEnd');
       router.replaceUrl({ url: RouteConstants.POKE_LIST })
     }
+  }
+
+  aboutToAppear() {
+    this.splashViewModel = new SplashViewModel(storage)
   }
 
   build() {
@@ -50,7 +53,9 @@ struct SplashAsync {
     .width('100%')
     .onAppear(() => {
       console.log('on appear')
-      splashViewModel.prepareWhileSplashShown(this.getUIContext().getHostContext())
+      if (this.splashViewModel != null) {
+        this.splashViewModel.prepareWhileSplashShown(this.getUIContext().getHostContext())
+      }
     })
   }
 }
