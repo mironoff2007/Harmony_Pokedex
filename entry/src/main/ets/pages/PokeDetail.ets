@@ -1,6 +1,7 @@
 import router from '@ohos.router'
 import { ContentViewState, ViewState, ViewStateGeneric } from '../common/State';
 import { Pokemon } from '../model/Pokemon';
+import { PokeDetailConstants } from '../viewmodel/pokedetail/PokeDetailConstants';
 import { PokeDetailParams } from '../viewmodel/pokedetail/PokeDetailParams'
 import { PokeDetailState } from '../viewmodel/pokedetail/PokeDetailState';
 import { PokeDetailViewModel } from '../viewmodel/pokedetail/PokeDetailViewModel';
@@ -19,7 +20,7 @@ struct PokeDetail {
   @State intervalLoading: number = -1;
   @State name: string = ''
 
-  @LocalStorageProp('pokeDetailState')
+  @LocalStorageProp(PokeDetailConstants.POKE_DETAIL_STATE_KEY)
   @Watch('onStateChange')
   state: ViewStateGeneric<PokeDetailState> = ViewState.loading;
 

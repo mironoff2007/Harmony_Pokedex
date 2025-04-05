@@ -7,11 +7,12 @@ const storage: LocalStorage = new LocalStorage();
 
 @Entry(storage)
 @Component
-struct SplashAsync {
+struct SplashScreen {
   private splashViewModel?: SplashViewModel
 
   @State message: string = 'Pokedex';
-  @LocalStorageProp('splashEnd')
+
+  @LocalStorageProp(SplashConstants.SPLASH_END)
   @Watch('onSplashEnd')
   splashEnd: boolean = false;
 

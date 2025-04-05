@@ -3,6 +3,7 @@ import { ContentViewState, FailureViewState, ViewState } from '../../common/Stat
 import { PokeRepo } from '../../db/PokeRepo';
 import { ViewModel } from '../../common/ViewModel';
 import { Pokemon } from '../../model/Pokemon';
+import { PokeDetailConstants } from './PokeDetailConstants';
 
 export class PokeDetailViewModel extends ViewModel {
   LOG_TAG: string = "PokeDetailViewModel-"
@@ -11,7 +12,7 @@ export class PokeDetailViewModel extends ViewModel {
 
   private setError(e: Error) {
     try {
-      const setResult = this.storage.set<FailureViewState>("pokeDetailState", ViewState.failure(e));
+      const setResult = this.storage.set<FailureViewState>(PokeDetailConstants.POKE_DETAIL_STATE_KEY, ViewState.failure(e));
       console.log("setResult-" + setResult);
     } catch (e) {
       console.error(e)
@@ -27,7 +28,7 @@ export class PokeDetailViewModel extends ViewModel {
       const poke:Pokemon = await this.pokeRepo.getByName(name)
       const pokeDetailState: PokeDetailState = { pokemon: poke };
       const setResult = this.storage.set<ContentViewState<PokeDetailState>>(
-        "pokeDetailState",
+        PokeDetailConstants.POKE_DETAIL_STATE_KEY,
         ViewState.content(pokeDetailState)  // Wrap in PokeDetailState
       );
       console.log("setResult-" + setResult);

@@ -8,11 +8,11 @@ import { PokeListState } from './PokeListState';
 import { PokeRepo } from '../../db/PokeRepo';
 import { AsyncCallback, BusinessError } from '../../common/AsyncCallback';
 import { ViewModel } from '../../common/ViewModel';
+import { PokeListConstants } from './PokeListConstants';
 
 export class PokeListViewModel extends ViewModel {
 
   LOG_TAG: string = "PokeListViewModel-"
-
   pokeRepo = new PokeRepo();
 
   getPokemons() {
@@ -55,7 +55,7 @@ export class PokeListViewModel extends ViewModel {
       let setResult = false
       const pokemonArray = Array.from(pokemons)
       const state: PokeListState = { pokemonsList: pokemonArray }
-      setResult = this.storage.set<ContentViewState<PokeListState>>("pokeListState", ViewState.content(state));
+      setResult = this.storage.set<ContentViewState<PokeListState>>(PokeListConstants.POKE_LIST_STATE_KEY, ViewState.content(state));
       console.log("setResult-" + setResult);
     } catch (e) {
       this.setError(e)
@@ -77,7 +77,7 @@ export class PokeListViewModel extends ViewModel {
 
   private setError(e: Error) {
     try {
-      const setResult = this.storage.set<FailureViewState>("pokeListState", ViewState.failure(e));
+      const setResult = this.storage.set<FailureViewState>(PokeListConstants.POKE_LIST_STATE_KEY, ViewState.failure(e));
       console.log("setResult-" + setResult);
     } catch (e) {
       console.error(e)
@@ -86,7 +86,7 @@ export class PokeListViewModel extends ViewModel {
 
   private setLoading() {
     try {
-      const setResult = this.storage.set<LoadingViewState>("pokeListState", ViewState.loading);
+      const setResult = this.storage.set<LoadingViewState>(PokeListConstants.POKE_LIST_STATE_KEY, ViewState.loading);
       console.log("setResult-" + setResult);
     } catch (e) {
       console.error(e)

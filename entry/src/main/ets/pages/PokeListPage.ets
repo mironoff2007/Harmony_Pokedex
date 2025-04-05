@@ -6,6 +6,8 @@ import { RouteConstants } from './RouteConstants';
 import router from '@ohos.router';
 import { PokeDetailParams } from '../viewmodel/pokedetail/PokeDetailParams';
 import { PokeListAdapter } from '../viewmodel/pokelist/PokeListAdapter';
+import { PokeListConstants } from '../viewmodel/pokelist/PokeListConstants';
+
 let storage: LocalStorage = new LocalStorage();
 
 @Entry(storage)
@@ -18,7 +20,7 @@ struct PokeListPage {
   @State isLoading: boolean = true;
   @State intervalLoading: number = -1;
 
-  @LocalStorageProp('pokeListState')
+  @LocalStorageProp(PokeListConstants.POKE_LIST_STATE_KEY)
   @Watch('onStateChange')
   state: ViewStateGeneric<PokeListState> = ViewState.loading;
 
