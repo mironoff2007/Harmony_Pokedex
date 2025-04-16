@@ -1,19 +1,38 @@
 
-import { generateBucket, Pokemon } from '../../model/Pokemon';
+import { Pokemon } from '../../model/Pokemon';
 import { PokemonResponse } from '../../model/PokemonResponse';
 import ArrayList from '@ohos.util.ArrayList';
-import { ContentViewState, FailureViewState, LoadingViewState, ViewState } from '../../common/State';
+import { FailureViewState, ViewState, ViewStateGeneric } from '../../common/State';
 import { PokeInfo, PokemonInfoResponse } from '../../model/PokemonInfoResponse';
 import { PokeListState } from './PokeListState';
 import { PokeRepo } from '../../db/PokeRepo';
 import { AsyncCallback, BusinessError } from '../../common/AsyncCallback';
 import { ViewModel } from '../../common/ViewModel';
-import { PokeListConstants } from './PokeListConstants';
+import { PokeListAdapter } from './PokeListAdapter';
 
+@ObservedV2
 export class PokeListViewModel extends ViewModel {
+
+  constructor(storage: LocalStorage, adapter: PokeListAdapter ) {
+    super(storage);
+    this.adapter = adapter
+  }
+  private adapter: PokeListAdapter
 
   LOG_TAG: string = "PokeListViewModel-"
   pokeRepo = new PokeRepo();
+
+  @Trace
+  state: ViewStateGeneric<PokeListState> = ViewState.loading;
+  @Trace
+  updatePokemon: Pokemon | null = null;
+
+  @Monitor("updatePokemon")
+  onPokeUpdate(): void {
+    if (this.updatePokemon != null) {
+      this.adapter.updateData(this.updatePokemon.id, this.updatePokemon)
+    }
+  }
 
   getPokemons() {
     this.setLoading()
@@ -44,6 +63,10 @@ export class PokeListViewModel extends ViewModel {
     this.pokeRepo.getPokeInfo(poke, callback)
   }
 
+  getError(): string {
+    return (this.state as FailureViewState).error.message
+  }
+
   private setContent(pokemons: ArrayList<Pokemon>) {
     console.info(this.LOG_TAG + "setContent");
     try {
@@ -55,7 +78,8 @@ export class PokeListViewModel extends ViewModel {
       let setResult = false
       const pokemonArray = Array.from(pokemons)
       const state: PokeListState = { pokemonsList: pokemonArray }
-      setResult = this.storage.set<ContentViewState<PokeListState>>(PokeListConstants.POKE_LIST_STATE_KEY, ViewState.content(state));
+      this.state = ViewState.content(state)
+      this.adapter.addAllData(state.pokemonsList)
       console.log("setResult-" + setResult);
     } catch (e) {
       this.setError(e)
@@ -67,7 +91,7 @@ export class PokeListViewModel extends ViewModel {
     console.info(this.LOG_TAG + "updateContent");
     try {
       let setResult = false
-      setResult = this.storage.set<Pokemon>("pokeUpdate", pokemon);
+      this.updatePokemon = pokemon
       console.log("setResult-" + setResult);
     } catch (e) {
       this.setError(e)
@@ -77,8 +101,7 @@ export class PokeListViewModel extends ViewModel {
 
   private setError(e: Error) {
     try {
-      const setResult = this.storage.set<FailureViewState>(PokeListConstants.POKE_LIST_STATE_KEY, ViewState.failure(e));
-      console.log("setResult-" + setResult);
+      this.state = ViewState.failure(e)
     } catch (e) {
       console.error(e)
     }
@@ -86,8 +109,7 @@ export class PokeListViewModel extends ViewModel {
 
   private setLoading() {
     try {
-      const setResult = this.storage.set<LoadingViewState>(PokeListConstants.POKE_LIST_STATE_KEY, ViewState.loading);
-      console.log("setResult-" + setResult);
+      this.state = ViewState.loading
     } catch (e) {
       console.error(e)
     }

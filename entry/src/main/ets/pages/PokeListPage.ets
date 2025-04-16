@@ -6,54 +6,21 @@ import { RouteConstants } from './RouteConstants';
 import router from '@ohos.router';
 import { PokeDetailParams } from '../viewmodel/pokedetail/PokeDetailParams';
 import { PokeListAdapter } from '../viewmodel/pokelist/PokeListAdapter';
-import { PokeListConstants } from '../viewmodel/pokelist/PokeListConstants';
 
 let storage: LocalStorage = new LocalStorage();
 
 @Entry(storage)
-@Component
+@ComponentV2
 struct PokeListPage {
-  private pokeListViewModel?: PokeListViewModel;
-
-  @State message: string = 'PokeListPage';
-  @State progressVal: number = 0;
-  @State isLoading: boolean = true;
-  @State intervalLoading: number = -1;
-
-  @LocalStorageProp(PokeListConstants.POKE_LIST_STATE_KEY)
-  @Watch('onStateChange')
-  state: ViewStateGeneric<PokeListState> = ViewState.loading;
-
-  @LocalStorageProp('pokeUpdate')
-  @Watch('onPokeUpdate')
-  updatePokemon: Pokemon | null = null;
-
   private listAdapter: PokeListAdapter = new PokeListAdapter();
-  private error: Error | null = null;
-
-  // @Watch callback
-  onStateChange(): void {
-    if (ViewState.isLoading(this.state)) {
-
-    } else if (ViewState.isContent(this.state)) {
-      const localState = this.state as ContentViewState<PokeListState>
-      localState.value.pokemonsList.length
-      this.listAdapter.addAllData(localState.value.pokemonsList)
-    } else if (ViewState.isFailure(this.state)) {
-      const localState = this.state as FailureViewState
-      this.error = localState.error
-    }
-  }
-
-  // @Watch callback
-  onPokeUpdate(): void {
-    if (this.updatePokemon != null) {
-      this.listAdapter.updateData(this.updatePokemon.id, this.updatePokemon)
-    }
-  }
+  private pokeListViewModel: PokeListViewModel = new PokeListViewModel(storage, this.listAdapter);
+  @Local message: string = 'PokeListPage';
+  @Local progressVal: number = 0;
+  @Local isLoading: boolean = true;
+  @Local intervalLoading: number = -1;
 
   aboutToAppear() {
-    this.pokeListViewModel = new PokeListViewModel(storage)
+    this.pokeListViewModel = new PokeListViewModel(storage, this.listAdapter)
     this.pokeListViewModel.getPokemons()
     this.intervalLoading = setInterval(() => {
       this.progressVal = this.progressVal >= 100 ?
@@ -62,13 +29,13 @@ struct PokeListPage {
   }
 
   build() {
-    if (ViewState.isLoading(this.state)) {
+    if (ViewState.isLoading(this.pokeListViewModel.state)) {
       Stack({ alignContent: Alignment.Center }) {
         Progress({ value: 0, total: 100, type: ProgressType.Ring })
           .width(100)
           .value(this.progressVal)
       }.width('100%').height('100%')
-    } else if (ViewState.isContent(this.state)) {
+    } else if (ViewState.isContent(this.pokeListViewModel.state)) {
       Stack() {
         List() {
           LazyForEach(this.listAdapter, (item: Pokemon) => {
@@ -100,6 +67,12 @@ struct PokeListPage {
                 }
                 .alignItems(VerticalAlign.Center)
                 .justifyContent(FlexAlign.Center)
+                .onAppear(() => {
+                  console.info("draw-" + item.name)
+                  if (item.picUrl == "") {
+                    this.pokeListViewModel.getPokeInfo(item)
+                  }
+                })
               }
             }
             .height(120)
@@ -115,11 +88,9 @@ struct PokeListPage {
       }
       .height('100%')
       .width('100%')
-    } else if (ViewState.isFailure(this.state)) {
+    } else if (ViewState.isFailure(this.pokeListViewModel.state)) {
       Stack({ alignContent: Alignment.Center }) {
-        if (this.error != null) {
-          Text("Error-" + this.error.message)
-        }
+          Text("Error-" + this.pokeListViewModel.getError())
       }.width('100%').height('100%')
     } else {
 
