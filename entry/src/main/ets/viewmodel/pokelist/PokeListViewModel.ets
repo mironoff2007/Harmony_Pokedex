@@ -1,4 +1,3 @@
-
 import { Pokemon } from '../../model/Pokemon';
 import { PokemonResponse } from '../../model/PokemonResponse';
 import ArrayList from '@ohos.util.ArrayList';
@@ -12,27 +11,18 @@ import { PokeListAdapter } from './PokeListAdapter';
 
 @ObservedV2
 export class PokeListViewModel extends ViewModel {
-
-  constructor(storage: LocalStorage, adapter: PokeListAdapter ) {
+  constructor(storage: LocalStorage, adapter: PokeListAdapter) {
     super(storage);
     this.adapter = adapter
   }
-  private adapter: PokeListAdapter
 
+  private adapter: PokeListAdapter
   LOG_TAG: string = "PokeListViewModel-"
   pokeRepo = new PokeRepo();
-
   @Trace
   state: ViewStateGeneric<PokeListState> = ViewState.loading;
   @Trace
   updatePokemon: Pokemon | null = null;
-
-  @Monitor("updatePokemon")
-  onPokeUpdate(): void {
-    if (this.updatePokemon != null) {
-      this.adapter.updateData(this.updatePokemon.id, this.updatePokemon)
-    }
-  }
 
   getPokemons() {
     this.setLoading()
@@ -92,6 +82,7 @@ export class PokeListViewModel extends ViewModel {
     try {
       let setResult = false
       this.updatePokemon = pokemon
+      this.adapter.updateData(this.updatePokemon.id, this.updatePokemon)
       console.log("setResult-" + setResult);
     } catch (e) {
       this.setError(e)
@@ -142,7 +133,6 @@ export class PokeListViewModel extends ViewModel {
     this.updateContent(poke)
   }
 
-
   private callPokemonsFromServer(): void {
     class CallPokemonsFromServerCallback extends AsyncCallback<string, Error> {
       onCallback(err: BusinessError<Error> | null, data: string | null): void {
@@ -177,6 +167,5 @@ export class PokeListViewModel extends ViewModel {
       console.error(e)
     }
   }
-
 }
 
