@@ -6,19 +6,20 @@ import { PokeInfo, PokemonInfoResponse } from '../../model/PokemonInfoResponse';
 import { PokeListState } from './PokeListState';
 import { PokeRepo } from '../../db/PokeRepo';
 import { AsyncCallback, BusinessError } from '../../common/AsyncCallback';
-import { ViewModel } from '../../common/ViewModel';
 import { PokeListAdapter } from './PokeListAdapter';
+import { ViewModelV2 } from '../../common/ViewModelV2';
 
 @ObservedV2
-export class PokeListViewModel extends ViewModel {
-  constructor(storage: LocalStorage, adapter: PokeListAdapter) {
-    super(storage);
+export class PokeListViewModel extends ViewModelV2<PokeListState> {
+  constructor(adapter: PokeListAdapter) {
+    super();
     this.adapter = adapter
   }
 
   private adapter: PokeListAdapter
   LOG_TAG: string = "PokeListViewModel-"
   pokeRepo = new PokeRepo();
+
   @Trace
   state: ViewStateGeneric<PokeListState> = ViewState.loading;
   @Trace

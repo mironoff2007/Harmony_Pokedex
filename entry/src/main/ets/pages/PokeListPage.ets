@@ -1,26 +1,23 @@
 import { ContentViewState, FailureViewState, ViewState, ViewStateFactoryType, ViewStateGeneric } from '../common/State';
 import { Pokemon } from '../model/Pokemon';
 import { PokeListViewModel } from '../viewmodel/pokelist/PokeListViewModel';
-import { PokeListState } from '../viewmodel/pokelist/PokeListState';
 import { RouteConstants } from './RouteConstants';
 import router from '@ohos.router';
 import { PokeDetailParams } from '../viewmodel/pokedetail/PokeDetailParams';
 import { PokeListAdapter } from '../viewmodel/pokelist/PokeListAdapter';
 
-let storage: LocalStorage = new LocalStorage();
-
-@Entry(storage)
+@Entry()
 @ComponentV2
 struct PokeListPage {
   private listAdapter: PokeListAdapter = new PokeListAdapter();
-  private pokeListViewModel: PokeListViewModel = new PokeListViewModel(storage, this.listAdapter);
+  private pokeListViewModel: PokeListViewModel = new PokeListViewModel(this.listAdapter);
   @Local message: string = 'PokeListPage';
   @Local progressVal: number = 0;
   @Local isLoading: boolean = true;
   @Local intervalLoading: number = -1;
 
   aboutToAppear() {
-    this.pokeListViewModel = new PokeListViewModel(storage, this.listAdapter)
+    //this.pokeListViewModel = new PokeListViewModel(this.listAdapter)
     this.pokeListViewModel.getPokemons()
     this.intervalLoading = setInterval(() => {
       this.progressVal = this.progressVal >= 100 ?
